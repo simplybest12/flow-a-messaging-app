@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "215908689362",
+    "project_id": "flow-db99c",
+    "storage_bucket": "flow-db99c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:215908689362:android:464201b1dc4159841e540b",
+        "android_client_info": {
+          "package_name": "com.example.chat_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCE8J6M9fwEwDE0cIAaIa2LpIcjfGlKL2c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
