@@ -69,7 +69,7 @@ class _CallPageState extends State<CallPage> {
                   height: 200
                   ),
                   SizedBox(height: 20,),
-                  Text("No User Found...\nAdd some Friends!",
+                  Text("No User Found...\nCall some Friends!",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.ubuntu(
                     letterSpacing: 1.4,

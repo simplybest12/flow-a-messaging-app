@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 import 'dart:io';
 
@@ -20,19 +22,12 @@ class FirebaseAuthorization {
     )));
     try {
       signInWithGoogle().then((user) async {
-        if (user != null) {
-          if (await CloudFirestore().UserExist()) {
-            Navigator.pushNamedAndRemoveUntil(
-                context, '/home', (route) => false);
-          } else {
-            await CloudFirestore().CreateUser();
-            Navigator.pushNamedAndRemoveUntil(
-                context, '/tabbar', (route) => false);
-          }
-
+        if (await CloudFirestore().UserExist()) {
+          Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
         } else {
-          log('No user');
-          Get.snackbar("Error", "No User Exist");
+          await CloudFirestore.CreateUser();
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/tabbar', (route) => false);
         }
       });
     } catch (e) {
@@ -65,16 +60,24 @@ class FirebaseAuthorization {
   }
 
   Future<void> signOutcredential(BuildContext context) async {
+    // Show a loading animation
     Get.dialog(Center(
-        child: Lottie.asset(
-      'assets/animations/going.json',
-      height: 200,
-    )));
-    await auth.signOut();
-    await GoogleSignIn().signOut();
-    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      child: Lottie.asset(
+        'assets/animations/going.json',
+        height: 200,
+      ),
+    ));
+
+    // Update active status and perform sign-out operations
+    await CloudFirestore.updateActiveStatus(false);
+    await CloudFirestore.auth.signOut().then((_) async {
+      await GoogleSignIn().signOut().then((_) {
+        // Close dialog and navigate back to login screen
+        Navigator.pop(context);
+        Navigator.pop(context);
+        //  auth = FirebaseAuth.instance;
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      });
+    });
   }
-  
-
-
 }

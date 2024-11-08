@@ -1,5 +1,5 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chat_app/components/date_util.dart';
 import 'package:chat_app/components/mytextfield.dart';
 import 'package:chat_app/models/model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,13 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 import '../Database/cloud_database.dart';
 import '../Get/controller.dart';
 
 class UserProfilePage extends StatefulWidget {
   ChatUser user;
-  UserProfilePage({super.key,required this.user});
+  UserProfilePage({super.key, required this.user});
 
   @override
   State<UserProfilePage> createState() => _UserProfilePageState();
@@ -24,19 +23,13 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   final GetController controller = Get.put<GetController>(GetController());
 
-
   final User? user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
   }
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -66,25 +59,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-            
-                        Center(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                            ),
-                            child:CachedNetworkImage(
-                                fit: BoxFit.cover,
-                                imageUrl: widget.user.image ?? "",
-                                placeholder: (context, url) =>
-                                    Image.asset('assets/images/user(1).png'),
-                                errorWidget: (context, url, error) =>
-                                    Image.asset('assets/images/profile.png'),
-                              ),
-                            
-                          ),
+                    Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(
+                            MediaQuery.of(context).size.height * 0.25),
+                        child: CachedNetworkImage(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          fit: BoxFit.cover,
+                          imageUrl: widget.user.image ?? "",
+                          placeholder: (context, url) =>
+                              Image.asset('assets/images/user(1).png'),
+                          errorWidget: (context, url, error) =>
+                              Image.asset('assets/images/profile.png'),
                         ),
-                        
-                     
+                      ),
+                    ),
                     SizedBox(
                       height: 50,
                     ),
@@ -114,7 +103,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               fontWeight: FontWeight.bold,
                               fontSize: 14),
                         ),
-                        
                       ),
                     ),
                     Container(
@@ -143,7 +131,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               fontWeight: FontWeight.bold,
                               fontSize: 14),
                         ),
-                        
                       ),
                     ),
                     Container(
@@ -174,6 +161,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ),
                       ),
                     ),
+                    Text(MyDateUtils.getLastMessageTime(
+                        context: context,
+                        time: widget.user.createdAt.toString(),
+                        showYear: true))
                   ],
                 ),
               ),

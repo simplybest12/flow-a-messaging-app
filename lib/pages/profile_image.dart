@@ -138,10 +138,8 @@ class _ImageUsernameState extends State<ImageUsername> {
 
   @override
   Widget build(BuildContext context) {
-    print(selectedImage);
-    Brightness currentTheme = Theme.of(context).brightness;
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();

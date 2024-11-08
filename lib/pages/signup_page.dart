@@ -183,6 +183,7 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                     GestureDetector(
                       onTap: () {
+                        print("hello");
                         if (passwordcontroller.text.length >= 6 ||
                             cnfpasswordcontroller.text.length >= 6 &&
                                 emailcontroller.text.contains("@gmail.com")) {
