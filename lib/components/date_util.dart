@@ -7,57 +7,73 @@ class MyDateUtils {
     return TimeOfDay.fromDateTime(date).format(context);
   }
 
-  static String getLastActiveTime(
+static String getLastActiveTime(
       {required BuildContext context, required String lastActive}) {
-    final int timestamp = int.tryParse(lastActive) ?? -1;
-    if (timestamp == -1) return 'Last seen not available';
+    final int i = int.tryParse(lastActive) ?? -1;
 
-    DateTime time = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    //if time is not available then return below statement
+    if (i == -1) return 'Last seen not available';
+
+    DateTime time = DateTime.fromMillisecondsSinceEpoch(i);
     DateTime now = DateTime.now();
 
-    // Format time for "today" and "yesterday"
-    String formattedTime = DateFormat.jm().format(time);
-
-    // Check if it's today
-    if (time.year == now.year &&
+    String formattedTime = TimeOfDay.fromDateTime(time).format(context);
+    if (time.day == now.day &&
         time.month == now.month &&
-        time.day == now.day) {
+        time.year == time.year) {
       return 'Last seen today at $formattedTime';
     }
 
-    // Check if it's yesterday
-    if (time.year == now.year &&
-        time.month == now.month &&
-        now.day - time.day == 1) {
+    if ((now.difference(time).inHours / 24).round() == 1) {
       return 'Last seen yesterday at $formattedTime';
     }
 
-    // Format for other dates
-    String formattedDate = DateFormat('d MMM ').format(time);
-    return 'Last seen on $formattedDate at $formattedTime';
+    String month = _getMonth(time);
+
+    return 'Last seen on ${time.day} $month on $formattedTime';
   }
-
-  static String getLastMessageTime({
-    required BuildContext context,
-    required String time,
-    bool showYear = false,
-  }) {
-    // Check if the timestamp is in seconds (10 digits) or milliseconds (13 digits)
-    final int timestamp =
-        time.length == 10 ? int.parse(time) * 1000 : int.parse(time);
-
-    final DateTime sent = DateTime.fromMillisecondsSinceEpoch(timestamp);
+  static String getLastMessageTime(
+      {required BuildContext context,
+      required String time,
+      bool showYear = false}) {
+    final DateTime sent = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
     final DateTime now = DateTime.now();
 
-    // Check if the message was sent today
     if (now.day == sent.day &&
         now.month == sent.month &&
         now.year == sent.year) {
       return TimeOfDay.fromDateTime(sent).format(context);
     }
 
-    // Format based on whether the year should be displayed
-    final String dateFormat = showYear ? 'd MMM yyyy' : 'd MMM';
-    return DateFormat(dateFormat).format(sent);
+    return showYear
+        ? '${sent.day} ${_getMonth(sent)} ${sent.year}'
+        : '${sent.day} ${_getMonth(sent)}';
   }
+  static String getMessageTime(
+    {required BuildContext context, required String time}) {
+  final DateTime sent = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
+  final DateTime now = DateTime.now();
+
+  final formattedTime = TimeOfDay.fromDateTime(sent).format(context);
+  
+  if (now.day == sent.day &&
+      now.month == sent.month &&
+      now.year == sent.year) {
+    return formattedTime;  // Message sent today
+  }
+
+  return now.year == sent.year
+      ? '$formattedTime - ${sent.day} ${_getMonth(sent)}'  // Earlier this year
+      : '$formattedTime - ${sent.day} ${_getMonth(sent)} ${sent.year}';  // Previous years
+}
+
+// Example _getMonth function for readable month names
+static String _getMonth(DateTime date) {
+  const monthNames = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+  return monthNames[date.month - 1];
+}
+
 }

@@ -210,85 +210,89 @@ class _Chat_PageState extends State<Chat_Page> {
             height: 40,
           ),
           StreamBuilder(
-  stream: CloudFirestore.getUserInfo(widget.user),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return const CircularProgressIndicator(); // Show a loading indicator
-    }
+            stream: CloudFirestore.getUserInfo(widget.user),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator(); // Show a loading indicator
+              }
 
-    if (snapshot.hasError) {
-      return const Text('Error loading data'); // Handle any error that might occur
-    }
+              if (snapshot.hasError) {
+                return const Text(
+                    'Error loading data'); // Handle any error that might occur
+              }
 
-    final data = snapshot.data?.docs;
-    final list = data?.map((e) => ChatUser.fromJson(e.data())).toList() ?? [];
+              final data = snapshot.data?.docs;
+              final list =
+                  data?.map((e) => ChatUser.fromJson(e.data())).toList() ?? [];
 
-    return Row(
-      children: [
-        IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(
-            CupertinoIcons.back,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(
-              MediaQuery.of(context).size.height * 0.25),
-          child: CachedNetworkImage(
-            height: MediaQuery.of(context).size.height * 0.045,
-            width: MediaQuery.of(context).size.height * 0.045,
-            imageUrl: list.isNotEmpty && list[0].image != null
-                ? list[0].image!
-                : widget.user.image ?? '',
-            placeholder: (context, url) =>
-                Image.asset('assets/images/user(1).png'),
-            errorWidget: (context, url, error) =>
-                Image.asset('assets/images/profile.png'),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              list.isNotEmpty && list[0].name != null
-                  ? list[0].name!
-                  : widget.user.name ?? 'Unknown',
-              maxLines: 1,
-              style: GoogleFonts.titilliumWeb(
-                color: Theme.of(context).colorScheme.inversePrimary,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-            Text(
-              list.isNotEmpty && list[0].isOnline != null
-                  ? (list[0].isOnline!
-                      ? 'Online'
-                      : MyDateUtils.getLastActiveTime(
-                          context: context,
-                          lastActive: list[0].lastActive ?? DateTime.now().toString(),
-                        ))
-                  : MyDateUtils.getLastActiveTime(
-                      context: context,
-                      lastActive: widget.user.lastActive?.toString() ?? DateTime.now().toString(),
+              return Row(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(
+                      CupertinoIcons.back,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
-              maxLines: 1,
-              style: GoogleFonts.titilliumWeb(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 11,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  },
-)
-
+                  ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(
+                        MediaQuery.of(context).size.height * 0.25),
+                    child: CachedNetworkImage(
+                      height: MediaQuery.of(context).size.height * 0.045,
+                      width: MediaQuery.of(context).size.height * 0.045,
+                      imageUrl: list.isNotEmpty && list[0].image != null
+                          ? list[0].image!
+                          : widget.user.image ?? '',
+                      placeholder: (context, url) =>
+                          Image.asset('assets/images/user(1).png'),
+                      errorWidget: (context, url, error) =>
+                          Image.asset('assets/images/profile.png'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        list.isNotEmpty && list[0].name != null
+                            ? list[0].name!
+                            : widget.user.name ?? 'Unknown',
+                        maxLines: 1,
+                        style: GoogleFonts.titilliumWeb(
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        list.isNotEmpty && list[0].isOnline != null
+                            ? (list[0].isOnline!
+                                ? 'Online'
+                                : MyDateUtils.getLastActiveTime(
+                                    context: context,
+                                    lastActive: list[0].lastActive ??
+                                        DateTime.now().toString(),
+                                  ))
+                            : MyDateUtils.getLastActiveTime(
+                                context: context,
+                                lastActive:
+                                    widget.user.lastActive?.toString() ??
+                                        DateTime.now().toString(),
+                              ),
+                        maxLines: 1,
+                        style: GoogleFonts.titilliumWeb(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
+          )
         ],
       ),
     );
@@ -401,9 +405,14 @@ class _Chat_PageState extends State<Chat_Page> {
           MaterialButton(
             onPressed: () {
               if (textcontroller.text.isNotEmpty) {
-                CloudFirestore.sendMessage(
-                    widget.user, textcontroller.text, Type.text);
-                textcontroller.text = '';
+                if (_list.isEmpty) {
+                  CloudFirestore.sendFirstMessage(
+                      widget.user, textcontroller.text, Type.text);
+                } else {
+                  CloudFirestore.sendMessage(
+                      widget.user, textcontroller.text, Type.text);
+                  textcontroller.text = '';
+                }
               }
             },
             minWidth: 0,
